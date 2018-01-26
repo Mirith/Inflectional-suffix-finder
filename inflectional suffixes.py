@@ -26,11 +26,11 @@ from sklearn.metrics import accuracy_score
 from sklearn.externals import joblib
 
 # directory where data is stored
+# use the actual directory, don't copy/paste this line
 dir = "C:/Users/________/Documents/engsuffixes.txt"
 
 # reading the dataset into something computers can work with
-# basically this means that each entry has multiple points of data, # and each point is delimited by a space
-# can be things like backslashes or hyphens or commas too... 
+# header = 0, or the first line.  column names, sort of like vector names
 dataset = pd.read_csv(dir, header = 0, delimiter = " ")
 
 ###############################################
@@ -40,9 +40,11 @@ dataset = pd.read_csv(dir, header = 0, delimiter = " ")
 # docs_test -- testing input data
 # class_train -- training input results
 # class_test -- testing input results
+# dataset column/vector names pulled from actual data
 docs_train, docs_test, class_train, class_test = train_test_split(dataset["a.1"], dataset["#"], test_size = 0.20, random_state = 48)
+
 ###############################################
-# machine learning thingies!
+# machine learning pipeline
 
 # analyzes by character, ranging in chunks of 1 to four characters
 cv = CountVectorizer(analyzer = 'char', ngram_range = (1,4))
@@ -51,22 +53,22 @@ cv = CountVectorizer(analyzer = 'char', ngram_range = (1,4))
 # does improve accuracy by about 1% though
 tf = TfidfTransformer()
 
-# not even sure prof just said do it
+# logistic regression, not entirely sure what C is
+# professor recommended this line
 lr = LogisticRegression(C = 6.5)
 
 # nice pipeline that does all the things in one go
 morph = Pipeline([('vect', cv), ('tfidf', tf), ('clf', lr)])
 
-# training
+###############################################
+# training the model
 morph = morph.fit(docs_train, class_train)
 
-# testing
+# testing the model 
 predicted = morph.predict(docs_test)
 print('predicted accuracy:', accuracy_score(class_test, predicted) * 100, '%')
 
-###############################################
 # result:
-#
 # predicted accuracy: 93.2880728283 %
 
 ###############################################
